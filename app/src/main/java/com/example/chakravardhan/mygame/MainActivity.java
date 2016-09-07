@@ -2,11 +2,12 @@ package com.example.chakravardhan.mygame;
 
 import android.graphics.Bitmap;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.example.chakravardhan.mygame.common.Shared;
+import com.example.chakravardhan.mygame.engine.ScreenController;
+import com.example.chakravardhan.mygame.events.EventBus;
 import com.example.chakravardhan.mygame.utils.Utils;
 
 public class MainActivity extends FragmentActivity {
@@ -18,6 +19,8 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
 
         Shared.context = getApplicationContext();
+        Shared.eventBus = EventBus.getInstance();
+
 
         setContentView(R.layout.activity_main);
         mBackgroundImage = (ImageView) findViewById(R.id.background_image);
@@ -28,6 +31,7 @@ public class MainActivity extends FragmentActivity {
         setBackgroundImage();
 
         // set menu
+        ScreenController.getInstance().openScreen(ScreenController.Screen.MENU);
     }
 
     @Override
