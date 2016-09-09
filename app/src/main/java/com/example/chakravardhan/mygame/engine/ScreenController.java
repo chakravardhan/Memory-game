@@ -13,6 +13,7 @@ import com.example.chakravardhan.mygame.common.Shared;
 //import com.snatik.matches.fragments.DifficultySelectFragment;
 //import com.snatik.matches.fragments.GameFragment;
 import com.example.chakravardhan.mygame.fragments.MenuFragment;
+import com.example.chakravardhan.mygame.fragments.ThemeSelectFragment;
 
 public class ScreenController {
 
@@ -58,9 +59,10 @@ public class ScreenController {
 
 	private Fragment getFragment(Screen screen) {
 		switch (screen) {
-		case MENU:
-			return new MenuFragment();
-
+			case MENU:
+				return new MenuFragment();
+			case THEME_SELECT:
+				return new ThemeSelectFragment();
 		default:
 			break;
 		}
