@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.example.chakravardhan.mygame.R;
@@ -22,10 +23,17 @@ import com.example.chakravardhan.mygame.events.ui.ResetBackgroundEvent;
 import com.example.chakravardhan.mygame.events.ui.StartEvent;
 import com.example.chakravardhan.mygame.events.ui.ThemeSelectedEvent;
 
+import com.example.chakravardhan.mygame.model.BoardConfiguration;
+import com.example.chakravardhan.mygame.model.Game;
 import com.example.chakravardhan.mygame.themes.Theme;
 import com.example.chakravardhan.mygame.themes.Themes;
-
+import com.example.chakravardhan.mygame.model.BoardArrangment;
 import com.example.chakravardhan.mygame.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public class Engine extends EventObserverAdapter {
 
@@ -34,6 +42,9 @@ public class Engine extends EventObserverAdapter {
 	private Theme mSelectedTheme;
 	private ImageView mBackgroundImage;
 	private Handler mHandler;
+	private Game mPlayingGame = null;
+	private int mFlippedId = -1;
+	private int mToFlip = -1;
 
 	private Engine() {
 		mScreenController = ScreenController.getInstance();
@@ -106,6 +117,14 @@ public class Engine extends EventObserverAdapter {
 		mScreenController.openScreen(Screen.DIFFICULTY);
 	}
 	@Override
+	public void onEvent(NextGameEvent event) {
+		int difficulty = mPlayingGame.boardConfiguration.difficulty;
+		if (mPlayingGame.gameState.achievedStars == 3 && difficulty < 6) {
+			difficulty++;
+		}
+		Shared.eventBus.notify(new DifficultySelectedEvent(difficulty));
+	}
+	@Override
 	public void onEvent(ThemeSelectedEvent event) {
 		mSelectedTheme = event.theme;
 		mScreenController.openScreen(Screen.DIFFICULTY);
@@ -115,12 +134,19 @@ public class Engine extends EventObserverAdapter {
 			protected TransitionDrawable doInBackground(Void... params) {
 				Bitmap bitmap = Utils.scaleDown(R.drawable.background, Utils.screenWidth(), Utils.screenHeight());
 				Bitmap backgroundImage = Themes.getBackgroundImage(mSelectedTheme);
-				backgroundImage = Utils.crop(backgroundImage, Utils.screenHeight(), Utils.screenWidth());
-				Drawable backgrounds[] = new Drawable[2];
-				backgrounds[0] = new BitmapDrawable(Shared.context.getResources(), bitmap);
-				backgrounds[1] = new BitmapDrawable(Shared.context.getResources(), backgroundImage);
-				TransitionDrawable crossfader = new TransitionDrawable(backgrounds);
-				return crossfader;
+				if(backgroundImage==null){
+					Log.e("null","background image is null");
+					return null;
+				}else {
+
+
+					backgroundImage = Utils.crop(backgroundImage, Utils.screenHeight(), Utils.screenWidth());
+					Drawable backgrounds[] = new Drawable[2];
+					backgrounds[0] = new BitmapDrawable(Shared.context.getResources(), bitmap);
+					backgrounds[1] = new BitmapDrawable(Shared.context.getResources(), backgroundImage);
+					TransitionDrawable crossfader = new TransitionDrawable(backgrounds);
+					return crossfader;
+				}
 			}
 
 			@Override
@@ -132,10 +158,66 @@ public class Engine extends EventObserverAdapter {
 		};
 		task.execute();
 	}
+	private void arrangeBoard() {
+		BoardConfiguration boardConfiguration = mPlayingGame.boardConfiguration;
+		BoardArrangment boardArrangment = new BoardArrangment();
 
+		// build pairs
+		// result {0,1,2,...n} // n-number of tiles
+		List<Integer> ids = new ArrayList<Integer>();
+		for (int i = 0; i < boardConfiguration.numTiles; i++) {
+			ids.add(i);
+		}
+		// shuffle
+		// result {4,10,2,39,...}
+		Collections.shuffle(ids);
+
+		// place the board
+		List<String> tileImageUrls = mPlayingGame.theme.tileImageUrls;
+		Collections.shuffle(tileImageUrls);
+		boardArrangment.pairs = new HashMap<Integer, Integer>();
+		boardArrangment.tileUrls = new HashMap<Integer, String>();
+		int j = 0;
+		for (int i = 0; i < ids.size(); i++) {
+			if (i + 1 < ids.size()) {
+				// {4,10}, {2,39}, ...
+				boardArrangment.pairs.put(ids.get(i), ids.get(i + 1));
+				// {10,4}, {39,2}, ...
+				boardArrangment.pairs.put(ids.get(i + 1), ids.get(i));
+				// {4,
+				boardArrangment.tileUrls.put(ids.get(i), tileImageUrls.get(j));
+				boardArrangment.tileUrls.put(ids.get(i + 1), tileImageUrls.get(j));
+				i++;
+				j++;
+			}
+		}
+
+		mPlayingGame.boardArrangment = boardArrangment;
+	}
+	@Override
+	public void onEvent(DifficultySelectedEvent event) {
+		mFlippedId = -1;
+		mPlayingGame = new Game();
+		mPlayingGame.boardConfiguration = new BoardConfiguration(event.difficulty);
+		mPlayingGame.theme = mSelectedTheme;
+		mToFlip = mPlayingGame.boardConfiguration.numTiles;
+
+		// arrange board
+		arrangeBoard();
+
+		// start the screen
+		mScreenController.openScreen(Screen.GAME);
+	}
 	public void setBackgroundImageView(ImageView backgroundImage) {
 		mBackgroundImage = backgroundImage;
 	}
 
+	public Game getActiveGame() {
+		return mPlayingGame;
+	}
+
+	public Theme getSelectedTheme() {
+		return mSelectedTheme;
+	}
 
 }
