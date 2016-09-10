@@ -38,8 +38,8 @@ public class MenuFragment extends Fragment {
 		mTitle = (ImageView) view.findViewById(R.id.title);
 		Log.e("title","title ha set");
 		mStartGameButton = (ImageView) view.findViewById(R.id.start_game_button);
-		mSettingsGameButton = (ImageView) view.findViewById(R.id.settings_game_button);
-		mSettingsGameButton.setSoundEffectsEnabled(false);
+//		mSettingsGameButton = (ImageView) view.findViewById(R.id.settings_game_button);
+//		mSettingsGameButton.setSoundEffectsEnabled(false);
 
 		mStartGameButton.setOnClickListener(new View.OnClickListener() {
 

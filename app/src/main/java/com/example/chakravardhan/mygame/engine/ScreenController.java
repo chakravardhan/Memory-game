@@ -12,6 +12,9 @@ import com.example.chakravardhan.mygame.common.Shared;
 //import com.snatik.matches.events.ui.ResetBackgroundEvent;
 //import com.snatik.matches.fragments.DifficultySelectFragment;
 //import com.snatik.matches.fragments.GameFragment;
+import com.example.chakravardhan.mygame.events.ui.DifficultySelectedEvent;
+import com.example.chakravardhan.mygame.events.ui.ResetBackgroundEvent;
+import com.example.chakravardhan.mygame.fragments.DifficultySelectFragment;
 import com.example.chakravardhan.mygame.fragments.MenuFragment;
 import com.example.chakravardhan.mygame.fragments.ThemeSelectFragment;
 
@@ -54,6 +57,24 @@ public class ScreenController {
 		fragmentTransaction.commit();
 		openedScreens.add(screen);
 	}
+	public boolean onBack() {
+		if (openedScreens.size() > 0) {
+			Screen screenToRemove = openedScreens.get(openedScreens.size() - 1);
+			openedScreens.remove(openedScreens.size() - 1);
+			if (openedScreens.size() == 0) {
+				return true;
+			}
+			Screen screen = openedScreens.get(openedScreens.size() - 1);
+			openedScreens.remove(openedScreens.size() - 1);
+			openScreen(screen);
+			if ((screen == Screen.THEME_SELECT || screen == Screen.MENU) &&
+					(screenToRemove == Screen.DIFFICULTY || screenToRemove == Screen.GAME)) {
+				Shared.eventBus.notify(new ResetBackgroundEvent());
+			}
+			return false;
+		}
+		return true;
+	}
 
 
 
@@ -63,6 +84,8 @@ public class ScreenController {
 				return new MenuFragment();
 			case THEME_SELECT:
 				return new ThemeSelectFragment();
+			case DIFFICULTY:
+				return new DifficultySelectFragment();
 		default:
 			break;
 		}
