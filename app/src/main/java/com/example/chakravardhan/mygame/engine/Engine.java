@@ -11,10 +11,14 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.example.chakravardhan.mygame.R;
+import com.example.chakravardhan.mygame.common.Memory;
 import com.example.chakravardhan.mygame.common.Shared;
 import com.example.chakravardhan.mygame.engine.ScreenController.Screen;
 import com.example.chakravardhan.mygame.events.EventObserverAdapter;
 
+import com.example.chakravardhan.mygame.events.engine.FlipDownCardsEvent;
+import com.example.chakravardhan.mygame.events.engine.GameWonEvent;
+import com.example.chakravardhan.mygame.events.engine.HidePairCardsEvent;
 import com.example.chakravardhan.mygame.events.ui.BackGameEvent;
 import com.example.chakravardhan.mygame.events.ui.DifficultySelectedEvent;
 import com.example.chakravardhan.mygame.events.ui.FlipCardEvent;
@@ -25,9 +29,11 @@ import com.example.chakravardhan.mygame.events.ui.ThemeSelectedEvent;
 
 import com.example.chakravardhan.mygame.model.BoardConfiguration;
 import com.example.chakravardhan.mygame.model.Game;
+import com.example.chakravardhan.mygame.model.GameState;
 import com.example.chakravardhan.mygame.themes.Theme;
 import com.example.chakravardhan.mygame.themes.Themes;
 import com.example.chakravardhan.mygame.model.BoardArrangment;
+import com.example.chakravardhan.mygame.utils.Clock;
 import com.example.chakravardhan.mygame.utils.Utils;
 
 import java.util.ArrayList;
@@ -69,6 +75,7 @@ public class Engine extends EventObserverAdapter {
 	}
 
 	public void stop() {
+		mPlayingGame=null;
 		mBackgroundImage.setImageDrawable(null);
 		mBackgroundImage = null;
 		mHandler.removeCallbacksAndMessages(null);
@@ -211,6 +218,66 @@ public class Engine extends EventObserverAdapter {
 	public void setBackgroundImageView(ImageView backgroundImage) {
 		mBackgroundImage = backgroundImage;
 	}
+	@Override
+	public void onEvent(FlipCardEvent event) {
+		// Log.i("my_tag", "Flip: " + event.id);
+		int id = event.id;
+		if (mFlippedId == -1) {
+			mFlippedId = id;
+			// Log.i("my_tag", "Flip: mFlippedId: " + event.id);
+		} else {
+			if (mPlayingGame.boardArrangment.isPair(mFlippedId, id)) {
+				// Log.i("my_tag", "Flip: is pair: " + mFlippedId + ", " + id);
+				// send event - hide id1, id2
+				Shared.eventBus.notify(new HidePairCardsEvent(mFlippedId, id), 1000);
+				// play music
+			/*	mHandler.postDelayed(new Runnable() {
+
+					@Override
+					public void run() {
+						Music.playCorrent();
+					}
+				}, 1000);*/
+				mToFlip -= 2;
+				if (mToFlip == 0) {
+					int passedSeconds = (int) (Clock.getInstance().getPassedTime() / 1000);
+					Clock.getInstance().pause();
+					int totalTime = mPlayingGame.boardConfiguration.time;
+					GameState gameState = new GameState();
+					mPlayingGame.gameState = gameState;
+					// remained seconds
+					gameState.remainedSeconds = totalTime - passedSeconds;
+
+					// calc stars
+					if (passedSeconds <= totalTime / 2) {
+						gameState.achievedStars = 3;
+					} else if (passedSeconds <= totalTime - totalTime / 5) {
+						gameState.achievedStars = 2;
+					} else if (passedSeconds < totalTime) {
+						gameState.achievedStars = 1;
+					} else {
+						gameState.achievedStars = 0;
+					}
+
+					// calc score
+					gameState.achievedScore = mPlayingGame.boardConfiguration.difficulty * gameState.remainedSeconds * mPlayingGame.theme.id;
+
+					// save to memory
+					Memory.save(mPlayingGame.theme.id, mPlayingGame.boardConfiguration.difficulty, gameState.achievedStars);
+
+					Shared.eventBus.notify(new GameWonEvent(gameState), 1200);
+				}
+			} else {
+				// Log.i("my_tag", "Flip: all down");
+				// send event - flip all down
+
+				Shared.eventBus.notify(new FlipDownCardsEvent(), 1000);
+			}
+			mFlippedId = -1;
+			// Log.i("my_tag", "Flip: mFlippedId: " + mFlippedId);
+		}
+	}
+
 
 	public Game getActiveGame() {
 		return mPlayingGame;
