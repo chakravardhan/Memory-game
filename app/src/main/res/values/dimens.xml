@@ -39,7 +39,7 @@
     <!-- popup won -->
     <dimen name="popup_won_width">240dp</dimen>
     <dimen name="popup_won_height">300dp</dimen>
-    <dimen name="popup_button_back">75dp</dimen>
+    <dimen name="popup_button_back">40dp</dimen>
     <dimen name="popup_button_back_left">30dp</dimen>
     <dimen name="popup_button_back_bottom">10dp</dimen>
     <dimen name="popup_button_star_size">57dp</dimen>

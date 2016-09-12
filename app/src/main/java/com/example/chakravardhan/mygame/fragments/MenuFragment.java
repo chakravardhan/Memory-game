@@ -29,8 +29,7 @@ public class MenuFragment extends Fragment {
 
 	private ImageView mTitle;
 	private ImageView mStartGameButton;
-
-	private ImageView mSettingsGameButton;
+	private ImageView mStartButtonLights;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,8 +37,8 @@ public class MenuFragment extends Fragment {
 		mTitle = (ImageView) view.findViewById(R.id.title);
 		Log.e("title","title ha set");
 		mStartGameButton = (ImageView) view.findViewById(R.id.start_game_button);
-//		mSettingsGameButton = (ImageView) view.findViewById(R.id.settings_game_button);
-//		mSettingsGameButton.setSoundEffectsEnabled(false);
+
+		mStartButtonLights = (ImageView) view.findViewById(R.id.start_game_button_lights);
 
 		mStartGameButton.setOnClickListener(new View.OnClickListener() {
 
@@ -58,6 +57,7 @@ public class MenuFragment extends Fragment {
 				});
 			}
 		});
+		startLightsAnimation();
 
 		return view;
 	}
@@ -69,12 +69,11 @@ public class MenuFragment extends Fragment {
 		titleAnimator.setInterpolator(new AccelerateInterpolator(2));
 		titleAnimator.setDuration(300);
 
+	// lights
+		ObjectAnimator lightsAnimatorX = ObjectAnimator.ofFloat(mStartButtonLights, "scaleX", 0f);
+		ObjectAnimator lightsAnimatorY = ObjectAnimator.ofFloat(mStartButtonLights, "scaleY", 0f);
 
 
-		// settings button
-		ObjectAnimator settingsAnimator = ObjectAnimator.ofFloat(mSettingsGameButton, "translationY", Utils.px(120));
-		settingsAnimator.setInterpolator(new AccelerateInterpolator(2));
-		settingsAnimator.setDuration(300);
 
 
 
@@ -82,9 +81,20 @@ public class MenuFragment extends Fragment {
 		ObjectAnimator startButtonAnimator = ObjectAnimator.ofFloat(mStartGameButton, "translationY", Utils.px(130));
 		startButtonAnimator.setInterpolator(new AccelerateInterpolator(2));
 		startButtonAnimator.setDuration(300);
+		AnimatorSet animatorSet = new AnimatorSet();
+		animatorSet.playTogether(titleAnimator, lightsAnimatorX, lightsAnimatorY,startButtonAnimator);
+		animatorSet.addListener(adapter);
+		animatorSet.start();
 	}
 
 
-
+	private void startLightsAnimation() {
+		ObjectAnimator animator = ObjectAnimator.ofFloat(mStartButtonLights, "rotation", 0f, 360f);
+		animator.setInterpolator(new AccelerateDecelerateInterpolator());
+		animator.setDuration(6000);
+		animator.setRepeatCount(ValueAnimator.INFINITE);
+		mStartButtonLights.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+		animator.start();
+	}
 
 }

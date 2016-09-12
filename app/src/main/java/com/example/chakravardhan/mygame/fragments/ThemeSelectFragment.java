@@ -11,6 +11,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 
 import com.example.chakravardhan.mygame.R;
+import com.example.chakravardhan.mygame.common.Memory;
 import com.example.chakravardhan.mygame.common.Shared;
 import com.example.chakravardhan.mygame.events.ui.ThemeSelectedEvent;
 import com.example.chakravardhan.mygame.themes.Theme;
@@ -68,7 +69,7 @@ public class ThemeSelectFragment extends Fragment {
 	private void setStars(ImageView imageView, Theme theme, String type) {
 		int sum = 0;
 		for (int difficulty = 1; difficulty <= 6; difficulty++) {
-//			sum += Memory.getHighStars(theme.id, difficulty);
+			sum += Memory.getHighStars(theme.id, difficulty);
 		}
 		int num = sum / 6;
 		if (num != 0) {

@@ -16,6 +16,8 @@ import com.example.chakravardhan.mygame.events.engine.GameWonEvent;
 import com.example.chakravardhan.mygame.events.engine.HidePairCardsEvent;
 import com.example.chakravardhan.mygame.model.Game;
 import com.example.chakravardhan.mygame.ui.BoardView;
+import com.example.chakravardhan.mygame.ui.PopupManager;
+import com.example.chakravardhan.mygame.utils.Clock;
 
 
 public class GameFragment extends BaseFragment {
@@ -32,7 +34,6 @@ public class GameFragment extends BaseFragment {
 		((ViewGroup)view.findViewById(R.id.game_board)).setClipChildren(false);
 		mTime = (TextView) view.findViewById(R.id.time_bar_text);
 		mTimeImage = (ImageView) view.findViewById(R.id.time_bar_image);
-//		FontLoader.setTypeface(Shared.context, new TextView[] {mTime}, Font.GROBOLD);
 		mBoardView = BoardView.fromXml(getActivity().getApplicationContext(), view);
 		FrameLayout frameLayout = (FrameLayout) view.findViewById(R.id.game_container);
 		frameLayout.addView(mBoardView);
@@ -60,7 +61,8 @@ public class GameFragment extends BaseFragment {
 		int time = game.boardConfiguration.time;
 		setTime(time);
 		mBoardView.setBoard(game);
-		
+		startClock(time);
+
 	}
 	
 	private void setTime(int time) {
@@ -69,12 +71,27 @@ public class GameFragment extends BaseFragment {
 		mTime.setText(" " + String.format("%02d", min) + ":" + String.format("%02d", sec));
 	}
 
+	private void startClock(int sec) {
+		Clock clock = Clock.getInstance();
+		clock.startTimer(sec*1000, 1000, new Clock.OnTimerCount() {
 
+			@Override
+			public void onTick(long millisUntilFinished) {
+				setTime((int) (millisUntilFinished/1000));
+			}
+
+			@Override
+			public void onFinish() {
+				setTime(0);
+			}
+		});
+	}
 
 	@Override
 	public void onEvent(GameWonEvent event) {
 		mTime.setVisibility(View.GONE);
 		mTimeImage.setVisibility(View.GONE);
+		PopupManager.showPopupWon(event.gameState);
 	}
 
 	@Override

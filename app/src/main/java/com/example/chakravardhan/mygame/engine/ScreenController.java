@@ -9,10 +9,6 @@ import android.support.v4.app.FragmentTransaction;
 
 import com.example.chakravardhan.mygame.*;
 import com.example.chakravardhan.mygame.common.Shared;
-//import com.snatik.matches.events.ui.ResetBackgroundEvent;
-//import com.snatik.matches.fragments.DifficultySelectFragment;
-//import com.snatik.matches.fragments.GameFragment;
-import com.example.chakravardhan.mygame.events.ui.DifficultySelectedEvent;
 import com.example.chakravardhan.mygame.events.ui.ResetBackgroundEvent;
 import com.example.chakravardhan.mygame.fragments.DifficultySelectFragment;
 import com.example.chakravardhan.mygame.fragments.GameFragment;
@@ -40,8 +36,12 @@ public class ScreenController {
 		GAME,
 		DIFFICULTY,
 		THEME_SELECT
+
 	}
-	
+	public static Screen getLastScreen() {
+		return openedScreens.get(openedScreens.size() - 1);
+	}
+
 
 	public void openScreen(Screen screen) {
 		mFragmentManager = Shared.activity.getSupportFragmentManager();

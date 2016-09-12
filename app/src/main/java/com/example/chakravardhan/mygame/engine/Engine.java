@@ -33,6 +33,7 @@ import com.example.chakravardhan.mygame.model.GameState;
 import com.example.chakravardhan.mygame.themes.Theme;
 import com.example.chakravardhan.mygame.themes.Themes;
 import com.example.chakravardhan.mygame.model.BoardArrangment;
+import com.example.chakravardhan.mygame.ui.PopupManager;
 import com.example.chakravardhan.mygame.utils.Clock;
 import com.example.chakravardhan.mygame.utils.Utils;
 
@@ -120,11 +121,12 @@ public class Engine extends EventObserverAdapter {
 	}
 	@Override
 	public void onEvent(BackGameEvent event) {
-//		PopupManager.closePopup();
+		PopupManager.closePopup();
 		mScreenController.openScreen(Screen.DIFFICULTY);
 	}
 	@Override
 	public void onEvent(NextGameEvent event) {
+		PopupManager.closePopup();
 		int difficulty = mPlayingGame.boardConfiguration.difficulty;
 		if (mPlayingGame.gameState.achievedStars == 3 && difficulty < 6) {
 			difficulty++;
