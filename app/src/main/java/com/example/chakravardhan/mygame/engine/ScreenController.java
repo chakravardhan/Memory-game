@@ -15,6 +15,7 @@ import com.example.chakravardhan.mygame.common.Shared;
 import com.example.chakravardhan.mygame.events.ui.DifficultySelectedEvent;
 import com.example.chakravardhan.mygame.events.ui.ResetBackgroundEvent;
 import com.example.chakravardhan.mygame.fragments.DifficultySelectFragment;
+import com.example.chakravardhan.mygame.fragments.GameFragment;
 import com.example.chakravardhan.mygame.fragments.MenuFragment;
 import com.example.chakravardhan.mygame.fragments.ThemeSelectFragment;
 
@@ -86,6 +87,8 @@ public class ScreenController {
 				return new ThemeSelectFragment();
 			case DIFFICULTY:
 				return new DifficultySelectFragment();
+			case GAME:
+				return new GameFragment();
 		default:
 			break;
 		}
