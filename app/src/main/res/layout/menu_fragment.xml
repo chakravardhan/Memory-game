@@ -51,8 +51,8 @@
         android:layout_height="@dimen/title_height"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/title"
-        android:layout_alignParentTop="true"
+        android:src="@drawable/memory"
+        android:layout_above="@+id/start_game_button_lights"
         android:layout_centerHorizontal="true" />
 	
 	<ImageView

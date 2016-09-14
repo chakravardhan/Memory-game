@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
-            android:src="@drawable/download" />
+            android:src="@drawable/saartup" />
 
     </RelativeLayout>
 
@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
-            android:src="@drawable/company"/>
+            android:src="@drawable/mnc"/>
     </RelativeLayout>
 
 </LinearLayout>
